@@ -2,13 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentQuarter, getQuarterDates, todayUTCDateString } from "@/lib/quarter";
-import { signOut } from "@/lib/actions/auth";
 import { getCommitDaysForQuarter, syncCommitDaysIfStale } from "@/lib/commit-sync";
 import { NewQuarterUpload } from "@/components/puzzle/NewQuarterUpload";
 import { PuzzleGrid } from "@/components/puzzle/PuzzleGrid";
 import { RevealTodayButton } from "@/components/puzzle/RevealTodayButton";
 import { CommitGrass } from "@/components/grass/CommitGrass";
 import { HoveredDateProvider } from "@/components/dashboard/HoveredDateContext";
+import { AppHeader } from "@/components/dashboard/AppHeader";
+import { Card } from "@/components/ui/Card";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -65,54 +66,63 @@ export default async function DashboardPage() {
     commitCounts = Array.from(commitMap, ([date, count]) => ({ date, count }));
   }
 
-  return (
-    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-12">
-      <header className="flex w-full max-w-2xl items-center justify-between">
-        <h1 className="text-lg font-semibold">Tessera</h1>
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/gallery" className="text-sm underline opacity-70">
-            갤러리
-          </Link>
-          <Link href="/settings/github" className="text-sm underline opacity-70">
-            GitHub 연동
-          </Link>
-          <form action={signOut}>
-            <button type="submit" className="text-sm underline opacity-70">
-              로그아웃
-            </button>
-          </form>
-        </div>
-      </header>
+  const revealedCount = pieces.filter((p) => p.revealed).length;
 
-      {needsNewQuarter || !photoUrl || !activeQuarter ? (
-        <NewQuarterUpload userId={user.id} year={current.year} quarter={current.quarter} />
-      ) : (
-        <HoveredDateProvider>
-          <div className="w-full max-w-2xl space-y-8">
-            <PuzzleGrid
-              photoUrl={photoUrl}
-              gridCols={activeQuarter.grid_cols}
-              gridRows={activeQuarter.grid_rows}
-              pieces={pieces}
-            />
-            <RevealTodayButton
-              revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
-            />
-            <div className="space-y-2">
+  return (
+    <div className="flex min-h-screen flex-col">
+      <AppHeader />
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+        {needsNewQuarter || !photoUrl || !activeQuarter ? (
+          <Card className="p-8">
+            <NewQuarterUpload userId={user.id} year={current.year} quarter={current.quarter} />
+          </Card>
+        ) : (
+          <HoveredDateProvider>
+            <Card className="overflow-hidden">
+              <div className="p-5 sm:p-6">
+                <div className="mb-4">
+                  <h2 className="text-sm font-semibold tracking-wide text-zinc-200">
+                    {current.year}년 {current.quarter}분기 퍼즐
+                  </h2>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    {revealedCount}/{pieces.length} 조각 공개됨
+                  </p>
+                </div>
+                <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
+                  <PuzzleGrid
+                    photoUrl={photoUrl}
+                    gridCols={activeQuarter.grid_cols}
+                    gridRows={activeQuarter.grid_rows}
+                    pieces={pieces}
+                  />
+                </div>
+              </div>
+              <div className="border-t border-white/10 bg-white/[0.02] py-5">
+                <RevealTodayButton
+                  revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
+                />
+              </div>
+            </Card>
+
+            <Card className="p-5 sm:p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-semibold tracking-wide text-zinc-200">커밋 잔디</h2>
+                <p className="mt-0.5 text-xs text-zinc-500">연동된 GitHub 계정의 컨트리뷰션 합산</p>
+              </div>
               <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
               {!hasGithubUsernames && (
-                <p className="text-xs opacity-50">
+                <p className="mt-3 text-xs text-zinc-500">
                   아직 연동된 GitHub 계정이 없습니다.{" "}
-                  <Link href="/settings/github" className="underline">
+                  <Link href="/settings/github" className="text-amber-400 hover:underline">
                     사용자명을 등록
                   </Link>
                   하면 잔디가 채워집니다.
                 </p>
               )}
-            </div>
-          </div>
-        </HoveredDateProvider>
-      )}
-    </main>
+            </Card>
+          </HoveredDateProvider>
+        )}
+      </main>
+    </div>
   );
 }

@@ -26,3 +26,21 @@ export function getCommitLevel(count: number, maxCount: number): 0 | 1 | 2 | 3 |
   if (ratio > 0.25) return 2;
   return 1;
 }
+
+const MONTH_LABELS = [
+  "1월", "2월", "3월", "4월", "5월", "6월",
+  "7월", "8월", "9월", "10월", "11월", "12월",
+];
+
+/** 각 주(열)가 새로운 달의 시작을 포함할 때만 그 달의 라벨을 붙인다 (GitHub 그래프와 동일 규칙) */
+export function getMonthLabels(weeks: (string | null)[][]): (string | null)[] {
+  let lastMonth = -1;
+  return weeks.map((week) => {
+    const firstDate = week.find((d): d is string => d !== null);
+    if (!firstDate) return null;
+    const month = new Date(`${firstDate}T00:00:00Z`).getUTCMonth();
+    if (month === lastMonth) return null;
+    lastMonth = month;
+    return MONTH_LABELS[month];
+  });
+}

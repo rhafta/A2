@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent } from "react";
+import { ImagePlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { startQuarter } from "@/app/dashboard/actions";
 
@@ -11,6 +12,8 @@ interface NewQuarterUploadProps {
 }
 
 export function NewQuarterUpload({ userId, year, quarter }: NewQuarterUploadProps) {
+  const inputId = useId();
+  const [fileName, setFileName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,19 +44,41 @@ export function NewQuarterUpload({ userId, year, quarter }: NewQuarterUploadProp
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex w-full max-w-sm flex-col items-center gap-4 text-center"
-    >
-      <p className="text-sm opacity-70">
-        {year}년 {quarter}분기 퍼즐에 쓸 사진을 올려주세요.
-      </p>
-      <input type="file" name="photo" accept="image/*" required disabled={uploading} />
-      {error && <p className="text-sm text-red-500">{error}</p>}
+    <form onSubmit={handleSubmit} className="flex flex-col items-center gap-5 text-center">
+      <div>
+        <h2 className="text-base font-semibold text-zinc-100">
+          {year}년 {quarter}분기 퍼즐 시작하기
+        </h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          이번 분기 동안 매일 한 조각씩 공개될 사진을 골라주세요.
+        </p>
+      </div>
+
+      <label
+        htmlFor={inputId}
+        className="flex w-full max-w-xs cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-8 text-sm text-zinc-400 transition-colors hover:border-amber-400/50 hover:bg-white/[0.04]"
+      >
+        <ImagePlus className="size-6 text-zinc-500" strokeWidth={1.75} />
+        <span className="truncate text-zinc-300">{fileName ?? "사진 선택"}</span>
+        <span className="text-xs text-zinc-600">클릭해서 파일을 선택하세요</span>
+      </label>
+      <input
+        id={inputId}
+        type="file"
+        name="photo"
+        accept="image/*"
+        required
+        disabled={uploading}
+        className="sr-only"
+        onChange={(e) => setFileName(e.currentTarget.files?.[0]?.name ?? null)}
+      />
+
+      {error && <p className="text-sm text-red-400">{error}</p>}
+
       <button
         type="submit"
-        disabled={uploading}
-        className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50"
+        disabled={uploading || !fileName}
+        className="rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-amber-300 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
       >
         {uploading ? "업로드 중..." : "분기 시작하기"}
       </button>

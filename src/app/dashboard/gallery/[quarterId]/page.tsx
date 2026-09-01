@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getQuarterDates, type QuarterKey } from "@/lib/quarter";
 import { getCommitDaysForQuarter } from "@/lib/commit-sync";
 import { PuzzleGrid } from "@/components/puzzle/PuzzleGrid";
 import { CommitGrass } from "@/components/grass/CommitGrass";
 import { HoveredDateProvider } from "@/components/dashboard/HoveredDateContext";
+import { AppHeader } from "@/components/dashboard/AppHeader";
+import { Card } from "@/components/ui/Card";
 
 export default async function GalleryQuarterPage({
   params,
@@ -47,31 +50,48 @@ export default async function GalleryQuarterPage({
   };
   const commitMap = await getCommitDaysForQuarter(supabase, user.id, quarterKey);
   const commitCounts = Array.from(commitMap, ([date, count]) => ({ date, count }));
+  const revealedCount = pieces.filter((p) => p.revealed).length;
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 py-12">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">
-          {quarter.year}년 {quarter.quarter}분기
-        </h1>
-        <Link href="/dashboard/gallery" className="text-sm underline opacity-70">
+    <div className="flex min-h-screen flex-col">
+      <AppHeader active="gallery" />
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+        <Link
+          href="/dashboard/gallery"
+          className="flex w-fit items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-200"
+        >
+          <ArrowLeft className="size-3.5" />
           갤러리로
         </Link>
-      </div>
 
-      {signed?.signedUrl && (
-        <HoveredDateProvider>
-          <div className="space-y-8">
-            <PuzzleGrid
-              photoUrl={signed.signedUrl}
-              gridCols={quarter.grid_cols}
-              gridRows={quarter.grid_rows}
-              pieces={pieces}
-            />
-            <CommitGrass quarterDates={getQuarterDates(quarterKey)} counts={commitCounts} />
-          </div>
-        </HoveredDateProvider>
-      )}
-    </main>
+        {signed?.signedUrl && (
+          <HoveredDateProvider>
+            <Card className="p-5 sm:p-6">
+              <div className="mb-4">
+                <h1 className="text-sm font-semibold tracking-wide text-zinc-200">
+                  {quarter.year}년 {quarter.quarter}분기
+                </h1>
+                <p className="mt-0.5 text-xs text-zinc-500">
+                  {revealedCount}/{pieces.length} 조각 공개됨
+                </p>
+              </div>
+              <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
+                <PuzzleGrid
+                  photoUrl={signed.signedUrl}
+                  gridCols={quarter.grid_cols}
+                  gridRows={quarter.grid_rows}
+                  pieces={pieces}
+                />
+              </div>
+            </Card>
+
+            <Card className="p-5 sm:p-6">
+              <h2 className="mb-4 text-sm font-semibold tracking-wide text-zinc-200">커밋 잔디</h2>
+              <CommitGrass quarterDates={getQuarterDates(quarterKey)} counts={commitCounts} />
+            </Card>
+          </HoveredDateProvider>
+        )}
+      </main>
+    </div>
   );
 }
