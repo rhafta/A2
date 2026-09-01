@@ -63,6 +63,9 @@ export default async function DashboardPage() {
       <header className="flex w-full max-w-2xl items-center justify-between">
         <h1 className="text-lg font-semibold">Tessera</h1>
         <div className="flex items-center gap-4">
+          <Link href="/dashboard/gallery" className="text-sm underline opacity-70">
+            갤러리
+          </Link>
           <Link href="/settings/github" className="text-sm underline opacity-70">
             GitHub 연동
           </Link>
