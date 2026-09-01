@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { PuzzlePiece } from "@/components/puzzle/PuzzlePiece";
+import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
 
 export interface PuzzlePieceData {
   date: string;
@@ -17,7 +17,7 @@ interface PuzzleGridProps {
 }
 
 export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridProps) {
-  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const { hoveredDate, setHoveredDate } = useHoveredDate();
   const pieceByIndex = new Map(pieces.map((p) => [p.pieceIndex, p]));
   const cellCount = gridCols * gridRows;
 

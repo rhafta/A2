@@ -8,6 +8,7 @@ import { NewQuarterUpload } from "@/components/puzzle/NewQuarterUpload";
 import { PuzzleGrid } from "@/components/puzzle/PuzzleGrid";
 import { RevealTodayButton } from "@/components/puzzle/RevealTodayButton";
 import { CommitGrass } from "@/components/grass/CommitGrass";
+import { HoveredDateProvider } from "@/components/dashboard/HoveredDateContext";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -76,18 +77,20 @@ export default async function DashboardPage() {
       {needsNewQuarter || !photoUrl || !activeQuarter ? (
         <NewQuarterUpload userId={user.id} year={current.year} quarter={current.quarter} />
       ) : (
-        <div className="w-full max-w-2xl space-y-8">
-          <PuzzleGrid
-            photoUrl={photoUrl}
-            gridCols={activeQuarter.grid_cols}
-            gridRows={activeQuarter.grid_rows}
-            pieces={pieces}
-          />
-          <RevealTodayButton
-            revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
-          />
-          <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
-        </div>
+        <HoveredDateProvider>
+          <div className="w-full max-w-2xl space-y-8">
+            <PuzzleGrid
+              photoUrl={photoUrl}
+              gridCols={activeQuarter.grid_cols}
+              gridRows={activeQuarter.grid_rows}
+              pieces={pieces}
+            />
+            <RevealTodayButton
+              revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
+            />
+            <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
+          </div>
+        </HoveredDateProvider>
       )}
     </main>
   );

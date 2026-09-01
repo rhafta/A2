@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { buildWeeks, getCommitLevel } from "@/lib/grass";
+import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
 
 const LEVEL_CLASS: Record<0 | 1 | 2 | 3 | 4, string> = {
   0: "bg-zinc-800",
@@ -17,7 +17,7 @@ interface CommitGrassProps {
 }
 
 export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
-  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const { hoveredDate, setHoveredDate } = useHoveredDate();
   const countByDate = new Map(counts.map((c) => [c.date, c.count]));
   const maxCount = Math.max(0, ...counts.map((c) => c.count));
   const weeks = buildWeeks(quarterDates);
