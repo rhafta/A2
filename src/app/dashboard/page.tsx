@@ -52,7 +52,14 @@ export default async function DashboardPage() {
   }
 
   let commitCounts: { date: string; count: number }[] = [];
+  let hasGithubUsernames = false;
   if (!needsNewQuarter) {
+    const { count } = await supabase
+      .from("github_usernames")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    hasGithubUsernames = (count ?? 0) > 0;
+
     await syncCommitDaysIfStale(supabase, user.id, current);
     const commitMap = await getCommitDaysForQuarter(supabase, user.id, current);
     commitCounts = Array.from(commitMap, ([date, count]) => ({ date, count }));
@@ -91,7 +98,18 @@ export default async function DashboardPage() {
             <RevealTodayButton
               revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
             />
-            <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
+            <div className="space-y-2">
+              <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
+              {!hasGithubUsernames && (
+                <p className="text-xs opacity-50">
+                  아직 연동된 GitHub 계정이 없습니다.{" "}
+                  <Link href="/settings/github" className="underline">
+                    사용자명을 등록
+                  </Link>
+                  하면 잔디가 채워집니다.
+                </p>
+              )}
+            </div>
           </div>
         </HoveredDateProvider>
       )}

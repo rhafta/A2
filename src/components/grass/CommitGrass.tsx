@@ -23,33 +23,39 @@ export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
   const weeks = buildWeeks(quarterDates);
 
   return (
-    <div
-      className="grid gap-[3px]"
-      style={{ gridTemplateRows: "repeat(7, 1fr)", gridAutoFlow: "column" }}
-    >
-      {weeks.map((week, weekIndex) =>
-        week.map((date, dayIndex) => {
-          if (!date) {
-            return <div key={`${weekIndex}-${dayIndex}`} className="size-3" aria-hidden />;
-          }
-          const count = countByDate.get(date) ?? 0;
-          const level = getCommitLevel(count, maxCount);
+    // 모바일 화면에서 주 수가 많아지면 넘치는 대신 가로 스크롤로 대응
+    <div className="overflow-x-auto pb-1">
+      <div
+        className="grid w-max gap-[3px]"
+        style={{ gridTemplateRows: "repeat(7, 1fr)", gridAutoFlow: "column" }}
+      >
+        {weeks.map((week, weekIndex) =>
+          week.map((date, dayIndex) => {
+            if (!date) {
+              return <div key={`${weekIndex}-${dayIndex}`} className="size-3" aria-hidden />;
+            }
+            const count = countByDate.get(date) ?? 0;
+            const level = getCommitLevel(count, maxCount);
 
-          return (
-            <div
-              key={date}
-              role="img"
-              aria-label={`${date} 커밋 ${count}건`}
-              title={`${date} · 커밋 ${count}건`}
-              onMouseEnter={() => setHoveredDate(date)}
-              onMouseLeave={() => setHoveredDate(null)}
-              className={`size-3 rounded-[2px] transition-[outline] ${LEVEL_CLASS[level]} ${
-                hoveredDate === date ? "outline outline-2 outline-amber-400" : "outline-none"
-              }`}
-            />
-          );
-        }),
-      )}
+            return (
+              <div
+                key={date}
+                role="img"
+                aria-label={`${date} 커밋 ${count}건`}
+                title={`${date} · 커밋 ${count}건`}
+                tabIndex={0}
+                onMouseEnter={() => setHoveredDate(date)}
+                onMouseLeave={() => setHoveredDate(null)}
+                onFocus={() => setHoveredDate(date)}
+                onBlur={() => setHoveredDate(null)}
+                className={`size-3 rounded-[2px] outline outline-2 transition-[outline-color] ${LEVEL_CLASS[level]} ${
+                  hoveredDate === date ? "outline-amber-400" : "outline-transparent"
+                }`}
+              />
+            );
+          }),
+        )}
+      </div>
     </div>
   );
 }

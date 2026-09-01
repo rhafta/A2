@@ -32,16 +32,24 @@ export function PuzzlePiece({
     <div
       role="img"
       aria-label={revealed ? "공개된 퍼즐 조각" : "아직 공개되지 않은 퍼즐 조각"}
+      tabIndex={0}
       onMouseEnter={() => onHoverChange?.(true)}
       onMouseLeave={() => onHoverChange?.(false)}
-      className={`relative aspect-square overflow-hidden rounded-sm transition-[outline] ${
-        highlighted ? "outline outline-2 outline-amber-400" : "outline-none"
+      onFocus={() => onHoverChange?.(true)}
+      onBlur={() => onHoverChange?.(false)}
+      className={`relative aspect-square overflow-hidden rounded-sm outline-none transition-[outline-color] ${
+        highlighted ? "outline outline-2 outline-amber-400" : "outline outline-2 outline-transparent"
       }`}
       style={{ backgroundImage: `url(${photoUrl})`, ...cropStyle }}
     >
-      {!revealed && (
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
-      )}
+      {/* 오버레이를 항상 렌더링하고 opacity만 전환해, 공개될 때 사진이 서서히 드러나는
+          느낌을 준다(과한 컨페티 없이 절제된 리빌 피드백). */}
+      <div
+        aria-hidden
+        className={`absolute inset-0 bg-black/70 backdrop-blur-[2px] transition-opacity duration-300 ease-out ${
+          revealed ? "pointer-events-none opacity-0" : "opacity-100"
+        }`}
+      />
     </div>
   );
 }
