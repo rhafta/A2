@@ -1,5 +1,7 @@
 // supabase/migrations/*.sql 스키마와 수동 동기화.
 // 실제 Supabase 프로젝트 연결 후에는 `supabase gen types typescript`로 재생성 권장.
+// Relationships/Views/Functions는 @supabase/postgrest-js의 GenericSchema 제약을
+// 만족시키기 위해 필요 (없으면 타입 추론이 전부 never로 무너진다).
 
 export interface Database {
   public: {
@@ -18,6 +20,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
+        Relationships: [];
       };
       github_usernames: {
         Row: {
@@ -33,6 +36,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["github_usernames"]["Insert"]>;
+        Relationships: [];
       };
       quarters: {
         Row: {
@@ -58,6 +62,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["quarters"]["Insert"]>;
+        Relationships: [];
       };
       puzzle_pieces: {
         Row: {
@@ -77,6 +82,7 @@ export interface Database {
           revealed_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["puzzle_pieces"]["Insert"]>;
+        Relationships: [];
       };
       commit_days: {
         Row: {
@@ -94,7 +100,10 @@ export interface Database {
           synced_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["commit_days"]["Insert"]>;
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 }

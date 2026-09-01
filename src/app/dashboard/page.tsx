@@ -1,20 +1,78 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentQuarter, todayUTCDateString } from "@/lib/quarter";
 import { signOut } from "@/lib/actions/auth";
+import { NewQuarterUpload } from "@/components/puzzle/NewQuarterUpload";
+import { PuzzleGrid } from "@/components/puzzle/PuzzleGrid";
+import { RevealTodayButton } from "@/components/puzzle/RevealTodayButton";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const current = getCurrentQuarter();
+  const { data: activeQuarter } = await supabase
+    .from("quarters")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("status", "active")
+    .maybeSingle();
+
+  const needsNewQuarter =
+    !activeQuarter ||
+    activeQuarter.year !== current.year ||
+    activeQuarter.quarter !== current.quarter;
+
+  let photoUrl: string | null = null;
+  let pieces: { date: string; pieceIndex: number; revealed: boolean }[] = [];
+
+  if (!needsNewQuarter && activeQuarter) {
+    const { data: signed } = await supabase.storage
+      .from("quarter-photos")
+      .createSignedUrl(activeQuarter.photo_url, 3600);
+    photoUrl = signed?.signedUrl ?? null;
+
+    const { data: pieceRows } = await supabase
+      .from("puzzle_pieces")
+      .select("date, piece_index, revealed")
+      .eq("quarter_id", activeQuarter.id);
+
+    pieces = (pieceRows ?? []).map((p) => ({
+      date: p.date,
+      pieceIndex: p.piece_index,
+      revealed: p.revealed,
+    }));
+  }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
-      <p className="text-sm opacity-70">{user?.email ?? user?.id}님, 환영합니다.</p>
-      <form action={signOut}>
-        <button type="submit" className="text-sm underline">
-          로그아웃
-        </button>
-      </form>
+    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-12">
+      <header className="flex w-full max-w-2xl items-center justify-between">
+        <h1 className="text-lg font-semibold">Tessera</h1>
+        <form action={signOut}>
+          <button type="submit" className="text-sm underline opacity-70">
+            로그아웃
+          </button>
+        </form>
+      </header>
+
+      {needsNewQuarter || !photoUrl || !activeQuarter ? (
+        <NewQuarterUpload userId={user.id} year={current.year} quarter={current.quarter} />
+      ) : (
+        <div className="w-full max-w-2xl space-y-6">
+          <PuzzleGrid
+            photoUrl={photoUrl}
+            gridCols={activeQuarter.grid_cols}
+            gridRows={activeQuarter.grid_rows}
+            pieces={pieces}
+          />
+          <RevealTodayButton
+            revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
+          />
+        </div>
+      )}
     </main>
   );
 }
