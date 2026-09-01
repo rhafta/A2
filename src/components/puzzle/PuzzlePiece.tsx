@@ -54,7 +54,7 @@ export function PuzzlePiece({
       onFocus={() => onHoverChange?.(true)}
       onBlur={() => onHoverChange?.(false)}
       className={`relative aspect-square overflow-hidden rounded-sm outline-none transition-[outline-color] duration-300 ${
-        highlighted ? "outline outline-2 outline-amber-400" : "outline outline-2 outline-transparent"
+        highlighted ? "outline outline-2 outline-accent" : "outline outline-2 outline-transparent"
       }`}
     >
       {/* 크롭된 배경 이미지는 별도의 안쪽 레이어에 둔다. 실제로 렌더해보니, overflow-hidden +
@@ -69,12 +69,14 @@ export function PuzzlePiece({
       />
 
       {/* 오버레이를 항상 렌더링하고 opacity만 전환해, 공개될 때 사진이 서서히 드러나는
-          느낌을 준다(과한 컨페티 없이 절제된 리빌 피드백). bg-black/70은 실제로 렌더해보니
-          색이 선명한 사진에서 형태가 다 비쳐 보여 "미공개" 느낌이 안 살아 zinc-950/95로
-          거의 다 가리되 완전 암전은 아니게 조정했다. */}
+          느낌을 준다(과한 컨페티 없이 절제된 리빌 피드백). 처음엔 라이트/다크 무관하게
+          고정된 짙은 색을 썼는데, 실제로 렌더해보니 라이트 테마에서 새까만 사각형이
+          "깨진 이미지"처럼 보여 테마별 --veil 토큰(라이트: 짙은 종이색, 다크: 거의
+          검정)으로 바꿨다 — 두 테마 모두 사진을 충분히 가리면서도 "덮여있다"는 느낌을
+          유지한다. (bg-cover는 Tailwind 내장 background-size 유틸과 이름이 겹쳐 피함) */}
       <div
         aria-hidden
-        className={`absolute inset-0 bg-zinc-950/95 transition-opacity duration-300 ease-out ${
+        className={`absolute inset-0 bg-veil/95 transition-opacity duration-300 ease-out ${
           revealed ? "pointer-events-none opacity-0" : "opacity-100"
         }`}
       />

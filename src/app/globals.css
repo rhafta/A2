@@ -1,19 +1,50 @@
 @import "tailwindcss";
 
-/* 다크 모드 고정 — 사진이 주인공인 화면이라 어두운 배경에서 대비가 살고,
-   미공개 퍼즐 조각의 "빈 자리" 느낌도 다크에서 더 잘 드러난다.
-   prefers-color-scheme 분기를 두면 OS가 light를 보고하는 다수 환경에서
-   기본값이 light로 뒤집히므로(다크 "기본"이라는 의도와 모순), 수동 토글을
-   추가하기 전까지는 시스템 설정과 무관하게 다크로 고정한다. */
+/* next-themes가 <html>에 붙이는 .dark 클래스를 기준으로 dark: 변형이 동작하게 한다
+   (Tailwind v4 기본값은 prefers-color-scheme 기준이라 수동 토글과 안 맞음). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 따뜻한 개인 기록 앱 톤 — 차가운 zinc 대신 stone 계열 웜그레이 기반.
+   라이트는 종이/스크랩북 느낌의 warm off-white, 다크는 순검정 대신 웜 차콜. */
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  color-scheme: dark;
+  --background: #faf7f2;
+  --foreground: #292420;
+  --card: #ffffff;
+  --card-foreground: #292420;
+  --muted: #efe9e1;
+  --muted-foreground: #78716c;
+  --border: rgba(41, 36, 32, 0.1);
+  --accent: #d97706;
+  --accent-foreground: #fffbeb;
+  /* 미공개 퍼즐 조각을 덮는 색 — 라이트에서 검정을 그대로 쓰면 "깨진 사각형"처럼
+     보여서(실제로 렌더해서 확인함), 종이가 덮인 듯한 짙은 warm tan을 쓴다. */
+  --veil: #e2dacb;
+}
+
+.dark {
+  --background: #1c1917;
+  --foreground: #faf9f7;
+  --card: #292524;
+  --card-foreground: #faf9f7;
+  --muted: #33302c;
+  --muted-foreground: #a8a29e;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #f59e0b;
+  --accent-foreground: #1c1917;
+  --veil: #100e0c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-veil: var(--veil);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -23,7 +54,7 @@ body {
   /* 완전히 평평한 단색 배경 대신 아주 은은한 앰버 톤 radial 워시로 깊이감을 준다 */
   background-image: radial-gradient(
     circle at 15% -10%,
-    color-mix(in oklch, var(--color-amber-400) 10%, transparent),
+    color-mix(in oklch, var(--accent) 12%, transparent),
     transparent 55%
   );
   background-attachment: fixed;

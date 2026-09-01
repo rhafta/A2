@@ -9,6 +9,7 @@ import { CommitGrass } from "@/components/grass/CommitGrass";
 import { HoveredDateProvider } from "@/components/dashboard/HoveredDateContext";
 import { AppHeader } from "@/components/dashboard/AppHeader";
 import { Card } from "@/components/ui/Card";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export default async function GalleryQuarterPage({
   params,
@@ -58,7 +59,7 @@ export default async function GalleryQuarterPage({
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
         <Link
           href="/dashboard/gallery"
-          className="flex w-fit items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-200"
+          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
           갤러리로
@@ -68,14 +69,15 @@ export default async function GalleryQuarterPage({
           <HoveredDateProvider>
             <Card className="p-5 sm:p-6">
               <div className="mb-4">
-                <h1 className="text-sm font-semibold tracking-wide text-zinc-200">
+                <h1 className="text-sm font-semibold tracking-wide text-foreground">
                   {quarter.year}년 {quarter.quarter}분기
                 </h1>
-                <p className="mt-0.5 text-xs text-zinc-500">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   {revealedCount}/{pieces.length} 조각 공개됨
                 </p>
               </div>
-              <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
+              <ProgressBar value={revealedCount} max={pieces.length} />
+              <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
                 <PuzzleGrid
                   photoUrl={signed.signedUrl}
                   gridCols={quarter.grid_cols}
@@ -86,7 +88,7 @@ export default async function GalleryQuarterPage({
             </Card>
 
             <Card className="p-5 sm:p-6">
-              <h2 className="mb-4 text-sm font-semibold tracking-wide text-zinc-200">커밋 잔디</h2>
+              <h2 className="mb-4 text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
               <CommitGrass quarterDates={getQuarterDates(quarterKey)} counts={commitCounts} />
             </Card>
           </HoveredDateProvider>

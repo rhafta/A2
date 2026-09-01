@@ -6,14 +6,15 @@ import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
 const CELL_PX = 12;
 const GAP_PX = 3;
 
+// GitHub의 초록 잔디를 그대로 베끼면 "개발자 대시보드" 느낌이 짙어져서, 앱의 앰버
+// 브랜드 컬러를 그대로 쓰는 온도감 있는 스케일로 바꿨다. 라이트에서는 진할수록,
+// 다크에서는 밝을수록 활동량이 많다는 동일한 관례를 유지한다.
 const LEVEL_CLASS: Record<0 | 1 | 2 | 3 | 4, string> = {
-  // 0단계는 배경(zinc-950)과 너무 가까우면 "칸이 없는 것"처럼 보여 그리드가
-  // 깨진 듯 보이므로, 빈 칸도 사각형으로 또렷이 읽히도록 한 단계 밝게 잡는다.
-  0: "bg-zinc-700",
-  1: "bg-green-900",
-  2: "bg-green-700",
-  3: "bg-green-500",
-  4: "bg-green-400",
+  0: "bg-muted",
+  1: "bg-amber-200 dark:bg-amber-900",
+  2: "bg-amber-300 dark:bg-amber-700",
+  3: "bg-amber-500 dark:bg-amber-500",
+  4: "bg-amber-700 dark:bg-amber-400",
 };
 
 interface CommitGrassProps {
@@ -38,7 +39,7 @@ export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
             label ? (
               <span
                 key={i}
-                className="absolute top-0 whitespace-nowrap text-[10px] text-zinc-500"
+                className="absolute top-0 whitespace-nowrap text-[10px] text-muted-foreground"
                 style={{ left: i * columnStep }}
               >
                 {label}
@@ -71,7 +72,7 @@ export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
                   onFocus={() => setHoveredDate(date)}
                   onBlur={() => setHoveredDate(null)}
                   className={`size-3 rounded-[2px] outline outline-2 transition-[outline-color] ${LEVEL_CLASS[level]} ${
-                    hoveredDate === date ? "outline-amber-400" : "outline-transparent"
+                    hoveredDate === date ? "outline-accent" : "outline-transparent"
                   }`}
                 />
               );
@@ -79,7 +80,7 @@ export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
           )}
         </div>
 
-        <div className="mt-2 flex items-center justify-end gap-1 text-[11px] text-zinc-500">
+        <div className="mt-2 flex items-center justify-end gap-1 text-[11px] text-muted-foreground">
           <span>적음</span>
           {([0, 1, 2, 3, 4] as const).map((level) => (
             <div key={level} className={`size-2.5 rounded-[2px] ${LEVEL_CLASS[level]}`} />

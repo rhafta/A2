@@ -10,6 +10,7 @@ import { CommitGrass } from "@/components/grass/CommitGrass";
 import { HoveredDateProvider } from "@/components/dashboard/HoveredDateContext";
 import { AppHeader } from "@/components/dashboard/AppHeader";
 import { Card } from "@/components/ui/Card";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -80,15 +81,21 @@ export default async function DashboardPage() {
           <HoveredDateProvider>
             <Card className="overflow-hidden">
               <div className="p-5 sm:p-6">
-                <div className="mb-4">
-                  <h2 className="text-sm font-semibold tracking-wide text-zinc-200">
-                    {current.year}년 {current.quarter}분기 퍼즐
-                  </h2>
-                  <p className="mt-0.5 text-xs text-zinc-500">
-                    {revealedCount}/{pieces.length} 조각 공개됨
-                  </p>
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-sm font-semibold tracking-wide text-foreground">
+                      {current.year}년 {current.quarter}분기 퍼즐
+                    </h2>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {revealedCount}/{pieces.length} 조각 공개됨
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-lg font-semibold tabular-nums text-accent">
+                    {Math.round((revealedCount / (pieces.length || 1)) * 100)}%
+                  </span>
                 </div>
-                <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
+                <ProgressBar value={revealedCount} max={pieces.length} />
+                <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
                   <PuzzleGrid
                     photoUrl={photoUrl}
                     gridCols={activeQuarter.grid_cols}
@@ -97,7 +104,7 @@ export default async function DashboardPage() {
                   />
                 </div>
               </div>
-              <div className="border-t border-white/10 bg-white/[0.02] py-5">
+              <div className="border-t border-border bg-muted/40 py-5">
                 <RevealTodayButton
                   revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
                 />
@@ -106,14 +113,16 @@ export default async function DashboardPage() {
 
             <Card className="p-5 sm:p-6">
               <div className="mb-4">
-                <h2 className="text-sm font-semibold tracking-wide text-zinc-200">커밋 잔디</h2>
-                <p className="mt-0.5 text-xs text-zinc-500">연동된 GitHub 계정의 컨트리뷰션 합산</p>
+                <h2 className="text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  연동된 GitHub 계정의 컨트리뷰션 합산
+                </p>
               </div>
               <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
               {!hasGithubUsernames && (
-                <p className="mt-3 text-xs text-zinc-500">
+                <p className="mt-3 text-xs text-muted-foreground">
                   아직 연동된 GitHub 계정이 없습니다.{" "}
-                  <Link href="/settings/github" className="text-amber-400 hover:underline">
+                  <Link href="/settings/github" className="text-accent hover:underline">
                     사용자명을 등록
                   </Link>
                   하면 잔디가 채워집니다.
