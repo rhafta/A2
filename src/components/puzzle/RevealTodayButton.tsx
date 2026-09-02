@@ -1,23 +1,57 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import confetti from "canvas-confetti";
 import { Puzzle, Check } from "lucide-react";
 import { revealToday } from "@/app/dashboard/actions";
 
-// 앱의 앰버 브랜드 팔레트를 그대로 써서 흔한 무지개색 컨페티 대신 톤이 맞는 축하 효과를 낸다.
-function fireConfetti() {
-  confetti({
-    particleCount: 90,
-    spread: 75,
-    startVelocity: 32,
-    origin: { y: 0.7 },
-    colors: ["#d97706", "#f59e0b", "#fbbf24", "#fffbeb"],
-  });
+const CONFETTI_COLORS = ["#d97706", "#f59e0b", "#fbbf24", "#fffbeb"];
+const CONFETTI_DURATION_MS = 3000;
+
+function randomInRange(min: number, max: number) {
+  return Math.random() * (max - min) + min;
 }
 
 export function RevealTodayButton({ revealed }: { revealed: boolean }) {
   const [isPending, startTransition] = useTransition();
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  // 앱의 앰버 브랜드 팔레트로, 화면 전체를 덮도록 좌우 가장자리에서 몇 초간 쏘아 올리고
+  // 중력을 낮춰 천천히 떨어지는 느낌을 준다 (canvas-confetti 공식 "realistic" 예제 응용).
+  function fireConfetti() {
+    if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
+
+    const defaults = {
+      colors: CONFETTI_COLORS,
+      startVelocity: 35,
+      spread: 360,
+      ticks: 500,
+      gravity: 0.5,
+      scalar: 1.2,
+      disableForReducedMotion: true,
+    };
+
+    confetti({ ...defaults, particleCount: 130, origin: { x: 0.5, y: 0.5 } });
+
+    const animationEnd = Date.now() + CONFETTI_DURATION_MS;
+    intervalRef.current = window.setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+      if (timeLeft <= 0) {
+        if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        return;
+      }
+      const particleCount = 60 * (timeLeft / CONFETTI_DURATION_MS);
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() * 0.4 } });
+      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() * 0.4 } });
+    }, 250);
+  }
 
   function handleClick() {
     fireConfetti();
