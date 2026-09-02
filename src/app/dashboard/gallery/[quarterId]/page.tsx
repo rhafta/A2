@@ -56,7 +56,7 @@ export default async function GalleryQuarterPage({
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader active="gallery" />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 lg:max-w-4xl">
         <Link
           href="/dashboard/gallery"
           className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -67,30 +67,32 @@ export default async function GalleryQuarterPage({
 
         {signed?.signedUrl && (
           <HoveredDateProvider>
-            <Card className="p-5 sm:p-6">
-              <div className="mb-4">
-                <h1 className="text-sm font-semibold tracking-wide text-foreground">
-                  {quarter.year}년 {quarter.quarter}분기
-                </h1>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {revealedCount}/{pieces.length} 조각 공개됨
-                </p>
-              </div>
-              <ProgressBar value={revealedCount} max={pieces.length} />
-              <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
-                <PuzzleGrid
-                  photoUrl={signed.signedUrl}
-                  gridCols={quarter.grid_cols}
-                  gridRows={quarter.grid_rows}
-                  pieces={pieces}
-                />
-              </div>
-            </Card>
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[3fr_2fr] lg:items-start">
+              <Card className="p-5 sm:p-6">
+                <div className="mb-4">
+                  <h1 className="text-sm font-semibold tracking-wide text-foreground">
+                    {quarter.year}년 {quarter.quarter}분기
+                  </h1>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {revealedCount}/{pieces.length} 조각 공개됨
+                  </p>
+                </div>
+                <ProgressBar value={revealedCount} max={pieces.length} />
+                <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
+                  <PuzzleGrid
+                    photoUrl={signed.signedUrl}
+                    gridCols={quarter.grid_cols}
+                    gridRows={quarter.grid_rows}
+                    pieces={pieces}
+                  />
+                </div>
+              </Card>
 
-            <Card className="p-5 sm:p-6">
-              <h2 className="mb-4 text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
-              <CommitGrass quarterDates={getQuarterDates(quarterKey)} counts={commitCounts} />
-            </Card>
+              <Card className="p-5 sm:p-6">
+                <h2 className="mb-4 text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
+                <CommitGrass quarterDates={getQuarterDates(quarterKey)} counts={commitCounts} />
+              </Card>
+            </div>
           </HoveredDateProvider>
         )}
       </main>
