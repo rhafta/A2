@@ -1,57 +1,33 @@
 "use client";
 
-import { useEffect, useRef, useTransition } from "react";
+import { useTransition } from "react";
 import confetti from "canvas-confetti";
 import { Puzzle, Check } from "lucide-react";
 import { revealToday } from "@/app/dashboard/actions";
 
 const CONFETTI_COLORS = ["#d97706", "#f59e0b", "#fbbf24", "#fffbeb"];
-const CONFETTI_DURATION_MS = 3000;
 
-function randomInRange(min: number, max: number) {
-  return Math.random() * (max - min) + min;
+// 앱의 앰버 브랜드 팔레트로, 화면 전체를 한 번에 채우는 화려한 단발성 폭죽을 터뜨린다.
+// 중앙 폭발 + 좌우 대포를 같은 순간에 동시 발사해 "한 번의 큰 이벤트"로 보이게 하고,
+// 중력을 낮춰 화면을 채운 색종이가 천천히 떨어지게 한다.
+function fireConfetti() {
+  const shared = {
+    colors: CONFETTI_COLORS,
+    gravity: 0.55,
+    scalar: 1.3,
+    ticks: 450,
+    disableForReducedMotion: true,
+  };
+
+  confetti({ ...shared, particleCount: 220, spread: 360, startVelocity: 48, origin: { x: 0.5, y: 0.5 } });
+  confetti({ ...shared, particleCount: 140, angle: 60, spread: 80, startVelocity: 75, origin: { x: 0, y: 0.65 } });
+  confetti({ ...shared, particleCount: 140, angle: 120, spread: 80, startVelocity: 75, origin: { x: 1, y: 0.65 } });
+  confetti({ ...shared, particleCount: 90, angle: 260, spread: 100, startVelocity: 55, origin: { x: 0.15, y: 0 } });
+  confetti({ ...shared, particleCount: 90, angle: 280, spread: 100, startVelocity: 55, origin: { x: 0.85, y: 0 } });
 }
 
 export function RevealTodayButton({ revealed }: { revealed: boolean }) {
   const [isPending, startTransition] = useTransition();
-  const intervalRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  // 앱의 앰버 브랜드 팔레트로, 화면 전체를 덮도록 좌우 가장자리에서 몇 초간 쏘아 올리고
-  // 중력을 낮춰 천천히 떨어지는 느낌을 준다 (canvas-confetti 공식 "realistic" 예제 응용).
-  function fireConfetti() {
-    if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
-
-    const defaults = {
-      colors: CONFETTI_COLORS,
-      startVelocity: 35,
-      spread: 360,
-      ticks: 500,
-      gravity: 0.5,
-      scalar: 1.2,
-      disableForReducedMotion: true,
-    };
-
-    confetti({ ...defaults, particleCount: 130, origin: { x: 0.5, y: 0.5 } });
-
-    const animationEnd = Date.now() + CONFETTI_DURATION_MS;
-    intervalRef.current = window.setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-      if (timeLeft <= 0) {
-        if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        return;
-      }
-      const particleCount = 60 * (timeLeft / CONFETTI_DURATION_MS);
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() * 0.4 } });
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() * 0.4 } });
-    }, 250);
-  }
 
   function handleClick() {
     fireConfetti();
