@@ -68,6 +68,8 @@ export default async function DashboardPage() {
   }
 
   const revealedCount = pieces.filter((p) => p.revealed).length;
+  const today = todayUTCDateString();
+  const missedCount = pieces.filter((p) => !p.revealed && p.date < today).length;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -93,6 +95,7 @@ export default async function DashboardPage() {
                       </h2>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {revealedCount}/{pieces.length} 조각 공개됨
+                        {missedCount > 0 && <> · 놓친 조각 {missedCount}개</>}
                       </p>
                     </div>
                     <span className="shrink-0 text-lg font-semibold tabular-nums text-accent">
@@ -111,7 +114,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="border-t border-border bg-muted/40 py-5">
                   <RevealTodayButton
-                    revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
+                    revealed={pieces.find((p) => p.date === today)?.revealed ?? false}
                   />
                 </div>
               </Card>
