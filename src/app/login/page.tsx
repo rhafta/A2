@@ -1,6 +1,7 @@
-import { signInWithGithub } from "@/app/login/actions";
+import { signInWithGithub, signInWithGoogle } from "@/app/login/actions";
 import { Card } from "@/components/ui/Card";
 import { GithubMark } from "@/components/icons/GithubMark";
+import { GoogleMark } from "@/components/icons/GoogleMark";
 
 export default async function LoginPage({
   searchParams,
@@ -24,15 +25,27 @@ export default async function LoginPage({
           </p>
         )}
 
-        <form action={signInWithGithub} className="mt-7">
-          <button
-            type="submit"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 active:scale-[0.98]"
-          >
-            <GithubMark className="size-4" />
-            GitHub로 로그인
-          </button>
-        </form>
+        <div className="mt-7 flex flex-col gap-2.5">
+          <form action={signInWithGithub}>
+            <button
+              type="submit"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 active:scale-[0.98]"
+            >
+              <GithubMark className="size-4" />
+              GitHub로 로그인
+            </button>
+          </form>
+
+          <form action={signInWithGoogle}>
+            <button
+              type="submit"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-muted active:scale-[0.98]"
+            >
+              <GoogleMark className="size-4" />
+              Google로 로그인
+            </button>
+          </form>
+        </div>
       </Card>
     </main>
   );

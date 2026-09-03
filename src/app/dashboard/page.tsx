@@ -72,63 +72,69 @@ export default async function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10">
+      <main
+        className={`mx-auto flex w-full flex-1 flex-col gap-6 px-4 py-10 ${
+          needsNewQuarter || !photoUrl || !activeQuarter ? "max-w-2xl" : "max-w-2xl lg:max-w-4xl"
+        }`}
+      >
         {needsNewQuarter || !photoUrl || !activeQuarter ? (
           <Card className="p-8">
             <NewQuarterUpload userId={user.id} year={current.year} quarter={current.quarter} />
           </Card>
         ) : (
           <HoveredDateProvider>
-            <Card className="overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-sm font-semibold tracking-wide text-foreground">
-                      {current.year}년 {current.quarter}분기 퍼즐
-                    </h2>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {revealedCount}/{pieces.length} 조각 공개됨
-                    </p>
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[3fr_2fr] lg:items-start">
+              <Card className="overflow-hidden">
+                <div className="p-5 sm:p-6">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-sm font-semibold tracking-wide text-foreground">
+                        {current.year}년 {current.quarter}분기 퍼즐
+                      </h2>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {revealedCount}/{pieces.length} 조각 공개됨
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-lg font-semibold tabular-nums text-accent">
+                      {Math.round((revealedCount / (pieces.length || 1)) * 100)}%
+                    </span>
                   </div>
-                  <span className="shrink-0 text-lg font-semibold tabular-nums text-accent">
-                    {Math.round((revealedCount / (pieces.length || 1)) * 100)}%
-                  </span>
+                  <ProgressBar value={revealedCount} max={pieces.length} />
+                  <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
+                    <PuzzleGrid
+                      photoUrl={photoUrl}
+                      gridCols={activeQuarter.grid_cols}
+                      gridRows={activeQuarter.grid_rows}
+                      pieces={pieces}
+                    />
+                  </div>
                 </div>
-                <ProgressBar value={revealedCount} max={pieces.length} />
-                <div className="mt-4 overflow-hidden rounded-xl ring-1 ring-border">
-                  <PuzzleGrid
-                    photoUrl={photoUrl}
-                    gridCols={activeQuarter.grid_cols}
-                    gridRows={activeQuarter.grid_rows}
-                    pieces={pieces}
+                <div className="border-t border-border bg-muted/40 py-5">
+                  <RevealTodayButton
+                    revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
                   />
                 </div>
-              </div>
-              <div className="border-t border-border bg-muted/40 py-5">
-                <RevealTodayButton
-                  revealed={pieces.find((p) => p.date === todayUTCDateString())?.revealed ?? false}
-                />
-              </div>
-            </Card>
+              </Card>
 
-            <Card className="p-5 sm:p-6">
-              <div className="mb-4">
-                <h2 className="text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  연동된 GitHub 계정의 컨트리뷰션 합산
-                </p>
-              </div>
-              <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
-              {!hasGithubUsernames && (
-                <p className="mt-3 text-xs text-muted-foreground">
-                  아직 연동된 GitHub 계정이 없습니다.{" "}
-                  <Link href="/settings/github" className="text-accent hover:underline">
-                    사용자명을 등록
-                  </Link>
-                  하면 잔디가 채워집니다.
-                </p>
-              )}
-            </Card>
+              <Card className="p-5 sm:p-6">
+                <div className="mb-4">
+                  <h2 className="text-sm font-semibold tracking-wide text-foreground">커밋 잔디</h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    연동된 GitHub 계정의 컨트리뷰션 합산
+                  </p>
+                </div>
+                <CommitGrass quarterDates={getQuarterDates(current)} counts={commitCounts} />
+                {!hasGithubUsernames && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    아직 연동된 GitHub 계정이 없습니다.{" "}
+                    <Link href="/settings/github" className="text-accent hover:underline">
+                      사용자명을 등록
+                    </Link>
+                    하면 잔디가 채워집니다.
+                  </p>
+                )}
+              </Card>
+            </div>
           </HoveredDateProvider>
         )}
       </main>

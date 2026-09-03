@@ -1,6 +1,7 @@
 "use client";
 
 import { PuzzlePiece } from "@/components/puzzle/PuzzlePiece";
+import { getPiecePosition } from "@/lib/puzzle-piece";
 import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
 
 export interface PuzzlePieceData {
@@ -18,30 +19,28 @@ interface PuzzleGridProps {
 
 export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridProps) {
   const { hoveredDate, setHoveredDate } = useHoveredDate();
-  const pieceByIndex = new Map(pieces.map((p) => [p.pieceIndex, p]));
-  const cellCount = gridCols * gridRows;
 
   return (
     <div
-      className="grid gap-1"
+      className="grid gap-0.5"
       style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
     >
-      {Array.from({ length: cellCount }, (_, i) => {
-        const piece = pieceByIndex.get(i);
-        // 분기 일수가 grid 칸 수보다 적을 때 남는 칸은 렌더링하지 않는다.
-        if (!piece) return <div key={i} aria-hidden />;
+      {pieces.map((piece) => {
+        const { row, col } = getPiecePosition(piece.pieceIndex, pieces.length, gridCols, gridRows);
 
         return (
-          <PuzzlePiece
-            key={piece.date}
-            photoUrl={photoUrl}
-            gridCols={gridCols}
-            gridRows={gridRows}
-            pieceIndex={i}
-            revealed={piece.revealed}
-            highlighted={hoveredDate === piece.date}
-            onHoverChange={(hovering) => setHoveredDate(hovering ? piece.date : null)}
-          />
+          <div key={piece.date} style={{ gridColumn: col + 1, gridRow: row + 1 }}>
+            <PuzzlePiece
+              photoUrl={photoUrl}
+              gridCols={gridCols}
+              gridRows={gridRows}
+              row={row}
+              col={col}
+              revealed={piece.revealed}
+              highlighted={hoveredDate === piece.date}
+              onHoverChange={(hovering) => setHoveredDate(hovering ? piece.date : null)}
+            />
+          </div>
         );
       })}
     </div>

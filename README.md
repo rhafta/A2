@@ -8,9 +8,9 @@
 
 1. [Supabase](https://supabase.com)에서 새 프로젝트 생성
 2. `supabase/migrations/*.sql`을 순서대로 SQL Editor에서 실행 (또는 Supabase CLI로 `supabase db push`)
-3. Authentication → Providers → GitHub 활성화
-   - GitHub 쪽에서 OAuth App 생성 시 Authorization callback URL은 Supabase가 알려주는 `https://<project-ref>.supabase.co/auth/v1/callback`으로 등록
-   - 발급받은 Client ID/Secret을 Supabase Provider 설정에 입력
+3. Authentication → Providers → GitHub, Google 활성화
+   - 두 프로바이더 모두 OAuth App(GitHub) / OAuth Client(Google) 생성 시 Authorization callback URL은 Supabase가 알려주는 `https://<project-ref>.supabase.co/auth/v1/callback`으로 등록
+   - 발급받은 Client ID/Secret을 각 Supabase Provider 설정에 입력
 4. Project Settings → API에서 Project URL과 anon key 확인
 
 ### 2. GitHub Personal Access Token 발급

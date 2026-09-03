@@ -7,7 +7,8 @@ interface PuzzlePieceProps {
   photoUrl: string;
   gridCols: number;
   gridRows: number;
-  pieceIndex: number;
+  row: number;
+  col: number;
   revealed: boolean;
   highlighted?: boolean;
   onHoverChange?: (hovering: boolean) => void;
@@ -17,17 +18,20 @@ interface PuzzlePieceProps {
  * 현재는 격자 크롭 방식 하나만 구현되어 있다. 좌표 계산(getPieceCropStyle)과
  * 렌더링을 분리해 둔 덕분에, 나중에 실제 직소 모양이 필요해지면 이 컴포넌트 내부만
  * SVG clipPath 방식으로 교체하면 되고 호출부(PuzzleGrid)와 데이터 모델은 그대로 유지된다.
+ * row/col은 PuzzleGrid가 계산한 실제 화면 배치 좌표를 그대로 받는다 — 크롭 위치와
+ * 배치 위치가 반드시 같은 값에서 나와야 사진이 제자리에 복원된다.
  */
 export function PuzzlePiece({
   photoUrl,
   gridCols,
   gridRows,
-  pieceIndex,
+  row,
+  col,
   revealed,
   highlighted = false,
   onHoverChange,
 }: PuzzlePieceProps) {
-  const cropStyle = getPieceCropStyle(pieceIndex, gridCols, gridRows);
+  const cropStyle = getPieceCropStyle(row, col, gridCols, gridRows);
 
   // false -> true로 바뀌는 "이 순간"만 팝 애니메이션을 재생한다. 처음 로드부터
   // 이미 공개돼 있던 조각들은(prevRevealed가 처음부터 true) 재생하지 않는다.
