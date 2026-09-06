@@ -30,9 +30,12 @@ export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridP
       {pieces.map((piece) => {
         const { row, col } = getPiecePosition(piece.pieceIndex, pieces.length, gridCols, gridRows);
 
-        // 미공개 조각의 날짜는 그리드 위치와 무관하게 무작위로 배정돼 있어(퍼즐의 핵심
-        // 컨셉), hover 연동을 켜두면 "왜 엉뚱한 칸이 반응하지?"처럼 보인다. 공개된
-        // 조각만 잔디와 하이라이트를 주고받는다.
+        // 아직 오지 않은 날짜의 조각은 그리드 위치와 무관하게 무작위로 배정돼 있어(퍼즐의
+        // 핵심 컨셉), hover 연동을 켜두면 "왜 엉뚱한 칸이 반응하지?"처럼 보인다. 반면
+        // 이미 지난 날짜(공개됐든, 놓쳐서 ✕로 표시됐든)는 실제로 확정된 자리이므로
+        // 잔디와 하이라이트를 주고받아도 혼란스럽지 않다.
+        const arrived = piece.date <= today;
+
         return (
           <div key={piece.date} style={{ gridColumn: col + 1, gridRow: row + 1 }}>
             <PuzzlePiece
@@ -44,9 +47,9 @@ export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridP
               date={piece.date}
               revealed={piece.revealed}
               missed={isMissedPiece(piece.date, piece.revealed, today)}
-              highlighted={piece.revealed && hoveredDate === piece.date}
+              highlighted={arrived && hoveredDate === piece.date}
               onHoverChange={(hovering) => {
-                if (!piece.revealed) return;
+                if (!arrived) return;
                 setHoveredDate(hovering ? piece.date : null);
               }}
             />
