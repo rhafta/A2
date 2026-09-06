@@ -2,6 +2,7 @@
 
 import { PuzzlePiece } from "@/components/puzzle/PuzzlePiece";
 import { getPiecePosition } from "@/lib/puzzle-piece";
+import { isMissedPiece, todayUTCDateString } from "@/lib/quarter";
 import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
 
 export interface PuzzlePieceData {
@@ -19,6 +20,7 @@ interface PuzzleGridProps {
 
 export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridProps) {
   const { hoveredDate, setHoveredDate } = useHoveredDate();
+  const today = todayUTCDateString();
 
   return (
     <div
@@ -39,7 +41,9 @@ export function PuzzleGrid({ photoUrl, gridCols, gridRows, pieces }: PuzzleGridP
               gridRows={gridRows}
               row={row}
               col={col}
+              date={piece.date}
               revealed={piece.revealed}
+              missed={isMissedPiece(piece.date, piece.revealed, today)}
               highlighted={piece.revealed && hoveredDate === piece.date}
               onHoverChange={(hovering) => {
                 if (!piece.revealed) return;

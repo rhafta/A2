@@ -1,16 +1,8 @@
 "use client";
 
 import { buildWeeks, getCommitLevel, getMonthLabels } from "@/lib/grass";
-import { todayUTCDateString } from "@/lib/quarter";
+import { formatKoreanDate, todayUTCDateString } from "@/lib/quarter";
 import { useHoveredDate } from "@/components/dashboard/HoveredDateContext";
-
-function formatTooltipDate(date: string) {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("ko-KR", {
-    timeZone: "UTC",
-    month: "long",
-    day: "numeric",
-  });
-}
 
 const CELL_PX = 12;
 const GAP_PX = 3;
@@ -78,7 +70,7 @@ export function CommitGrass({ quarterDates, counts }: CommitGrassProps) {
                       role="tooltip"
                       className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-[11px] font-medium text-background shadow-md"
                     >
-                      {formatTooltipDate(date)} · 커밋 {count}건
+                      {formatKoreanDate(date)} · 커밋 {count}건
                     </div>
                   )}
                   <div
