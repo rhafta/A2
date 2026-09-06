@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { X } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentQuarter, getQuarterDates, todayUTCDateString } from "@/lib/quarter";
+import { getCurrentQuarter, getQuarterDates, isMissedPiece, todayUTCDateString } from "@/lib/quarter";
 import { getCommitDaysForQuarter, syncCommitDaysIfStale } from "@/lib/commit-sync";
 import { NewQuarterUpload } from "@/components/puzzle/NewQuarterUpload";
 import { PuzzleGrid } from "@/components/puzzle/PuzzleGrid";
@@ -69,7 +70,7 @@ export default async function DashboardPage() {
 
   const revealedCount = pieces.filter((p) => p.revealed).length;
   const today = todayUTCDateString();
-  const missedCount = pieces.filter((p) => !p.revealed && p.date < today).length;
+  const missedCount = pieces.filter((p) => isMissedPiece(p.date, p.revealed, today)).length;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -111,6 +112,11 @@ export default async function DashboardPage() {
                       pieces={pieces}
                     />
                   </div>
+                  {missedCount > 0 && (
+                    <p className="mt-2 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <X className="size-3" strokeWidth={2.5} /> 표시는 놓쳐서 채우지 못한 조각이에요
+                    </p>
+                  )}
                 </div>
                 <div className="border-t border-border bg-muted/40 py-5">
                   <RevealTodayButton

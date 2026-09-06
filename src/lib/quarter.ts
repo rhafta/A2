@@ -16,6 +16,20 @@ export function todayUTCDateString(now: Date = new Date()): string {
   return now.toISOString().slice(0, 10);
 }
 
+/** "YYYY-MM-DD" 날짜 문자열을 "9월 6일" 형식의 한국어 표기로 변환 */
+export function formatKoreanDate(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString("ko-KR", {
+    timeZone: "UTC",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+/** 리빌은 "오늘" 조각만 가능해서, 지나간 날짜인데 아직 공개되지 않았다면 앞으로도 영영 채울 수 없다 */
+export function isMissedPiece(pieceDate: string, revealed: boolean, today: string): boolean {
+  return !revealed && pieceDate < today;
+}
+
 /** 분기의 시작일과 다음 분기 시작일(exclusive) — 둘 다 UTC 자정 */
 export function getQuarterBounds({ year, quarter }: QuarterKey): {
   start: Date;
